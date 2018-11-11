@@ -23,6 +23,7 @@ import android.hardware.camera2.TotalCaptureResult
 import android.hardware.camera2.params.StreamConfigurationMap
 import android.media.Image
 import android.media.ImageReader
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
@@ -163,10 +164,10 @@ class FMCamera : Fragment()
                     {
                         captureStillPicture()
                     }
-                    else if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState ||
-                             CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState)
+                    else if (afState == CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED  ||
+                             afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED)
                     {
-                        // CONTROL_AE_STATE can be null on some devices
+                        //CONTROL_AE_STATE can be null on some devices
                         val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
                         if (aeState == null || aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED)
                         {
@@ -177,6 +178,11 @@ class FMCamera : Fragment()
                         {
                             runPrecaptureSequence()
                         }
+                    }
+                    else if (afState == CaptureResult.CONTROL_AF_STATE_INACTIVE)
+                    {
+                        currentCamState = STATE_PICTURE_TAKEN
+                        captureStillPicture()
                     }
                 }
                 STATE_WAITING_PRECAPTURE     ->
@@ -225,6 +231,11 @@ class FMCamera : Fragment()
     companion object
     {
         //region Shared Properties
+
+        var lastPicTaken: Uri? = null
+
+        //endregion
+        //region Private Shared Properties
         //region Camera State "Enums"
 
         private const val STATE_PREVIEW = 0                 //Showing camera preview
@@ -437,8 +448,9 @@ class FMCamera : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-        button.setOnClickListener {
-            println("SNAP FOTO!")
+        fmCameraTakePhotoBt.setOnClickListener {
+            takePicture()
+            (activity as? ACMain)?.pushPhotoViewer()
         }
     }
 
@@ -956,7 +968,7 @@ class FMCamera : Fragment()
                 override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult)
                 {
                     unlockFocus()   //TODO do something with the file
-                    println("Saved ${oFile.toString()}")
+                    lastPicTaken = Uri.fromFile(oFile)
                     super.onCaptureCompleted(session, request, result)
                 }
             }

@@ -24,4 +24,19 @@ class ACMain : AppCompatActivity()
                 .addToBackStack(null)
                 .commit()
     }
+
+    fun pushPhotoViewer()
+    {
+        val photoFrag = FMPhotoPreview.newInstance()
+        supportFragmentManager.beginTransaction()
+                .add(photoFrag, "")
+                .replace(R.id.acMainFullFragLyt, photoFrag)
+                .addToBackStack(null)
+                .commit()
+    }
+
+    fun popNavStack()
+    {
+        supportFragmentManager.popBackStack()
+    }
 }
