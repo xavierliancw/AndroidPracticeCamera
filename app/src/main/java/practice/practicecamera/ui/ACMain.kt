@@ -17,7 +17,7 @@ class ACMain : AppCompatActivity()
 
     private fun pushCameraFrag()
     {
-        val camFrag = FMCamera.newInstance(config = VMCamera.UIConfiguration.Selfie)
+        val camFrag = FMCamera.newInstance()
         supportFragmentManager.beginTransaction()
                 .add(camFrag, "")
                 .replace(R.id.acMainFullFragLyt, camFrag)
