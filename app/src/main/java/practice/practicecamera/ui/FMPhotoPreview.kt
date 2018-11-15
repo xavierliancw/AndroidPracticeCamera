@@ -39,7 +39,7 @@ class FMPhotoPreview : Fragment()
     {
         super.onResume()
         val context = context ?: return
-        val lastPic = FMCamera.lastPicTaken ?: return
+        val lastPic = PIC_FILE_NAME
         Glide.with(context)
                 .load(lastPic)
                 .into(photoPreviewImgVw)
