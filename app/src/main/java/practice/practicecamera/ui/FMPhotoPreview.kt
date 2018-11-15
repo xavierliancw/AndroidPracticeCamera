@@ -1,13 +1,15 @@
 package practice.practicecamera.ui
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_fmphoto_preview.*
 import practice.practicecamera.R
+import practice.practicecamera.special.camera.CameraControl
+import java.io.File
 
 class FMPhotoPreview : Fragment()
 {
@@ -33,16 +35,30 @@ class FMPhotoPreview : Fragment()
         photoPreviewDismissBt.setOnClickListener {
             (activity as? ACMain)?.popNavStack()
         }
+        photoPreviewRefreshBt.setOnClickListener {
+            loadPic()
+        }
     }
 
-    override fun onResume()
+    private fun loadPic()
     {
-        super.onResume()
-        val context = context ?: return
-        val lastPic = FMCamera.lastPicTaken ?: return
-        Glide.with(context)
-                .load(lastPic)
-                .into(photoPreviewImgVw)
+        val lastPicUri = CameraControl.lastPicTaken
+        if (lastPicUri == null)
+        {
+            println("FILE DOES NOT EXIST SDLKFJSL:DJFL:KSDJLJ")
+            return
+        }
+        val lastPic = File(lastPicUri.path)
+        if (lastPic.exists())
+        {
+            println(lastPicUri)
+            val bMap = BitmapFactory.decodeFile(lastPicUri.path)
+            photoPreviewImgVw.setImageBitmap(bMap)
+        }
+        else
+        {
+            println("DOES NOT EXIST UGHGHHGHGHGHGH")
+        }
     }
 
     companion object
@@ -58,9 +74,9 @@ class FMPhotoPreview : Fragment()
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance() =
-                FMPhotoPreview().apply {
-                    arguments = Bundle().apply {
-                    }
+            FMPhotoPreview().apply {
+                arguments = Bundle().apply {
                 }
+            }
     }
 }
